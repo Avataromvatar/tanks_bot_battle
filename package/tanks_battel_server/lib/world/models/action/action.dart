@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'action.g.dart';
 
+@JsonEnum()
 enum eTankActions {
   platform_rotate_clockwise,
   platform_rotate_counterclockwise,
@@ -11,8 +12,10 @@ enum eTankActions {
   move_back,
   shoot;
 
-  String toJson() => name;
-  static eTankActions fromJson(String json) => values.byName(json);
+  // String toJson() => index.toString();
+  // static eTankActions fromJson(String json) => values.byName(json);
+  // int toJson() => index;
+  // static eTankActions fromJson(int json) => values[json];
 }
 
 enum eCommonActions {

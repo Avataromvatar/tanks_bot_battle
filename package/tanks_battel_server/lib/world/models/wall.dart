@@ -14,24 +14,26 @@ class Wall extends CellObject {
   ///
   ///HHHH - Hits
   Wall({int hit = 3, eWallType subtype = eWallType.brick})
-      : super(eTanksBattelMapObjectType.wall, value: ((subtype.index & 0x15) << 8) | (hit & 0x15));
+      : super(eTanksBattelMapObjectType.wall, value: ((subtype.index & 0x0F) << 8) | (hit & 0x0F));
 
   Wall.fromRaw(int value) : super(eTanksBattelMapObjectType.wall, value: value);
 
+  int get hit => getHits();
+  eWallType get subtype => eWallType.values[(value >> 8) & 0x0F];
   void setHit(int hit) {
-    update(value | (hit & 0x15));
+    update(BitHelper.clearData(value, 0x0F) | (hit & 0x0F));
   }
 
   void setWallType(eWallType type) {
-    update(value | (type.index & 0x15) << 8);
+    update(BitHelper.clearData(value, 0x0F << 8) | (type.index & 0x0F) << 8);
   }
 
   eWallType getWallType() {
-    return eWallType.values[(value >> 8) & 0x15];
+    return eWallType.values[(value >> 8) & 0x0F];
   }
 
   int getHits() {
-    return value & 0x15;
+    return value & 0x0F;
   }
 }
 

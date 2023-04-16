@@ -3,10 +3,13 @@ import 'package:tanks_battel_server/world/models/cell.dart';
 import 'package:tanks_battel_server/world/models/map.dart';
 
 class Bullet extends CellObject {
+  static int count = 0;
+  late final int bulletID;
+
   ///13bit value:
   ///X PPPP PPDD SSHH
   ///
-  ///X - not used
+  ///M - move in this turn
   ///
   ///PPPPPP - player ID
   ///
@@ -17,12 +20,40 @@ class Bullet extends CellObject {
   ///HH - damage
   Bullet({int playerID = 0, int speed = 2, int hit = 1, eDirection dir = eDirection.forward})
       : super(eTanksBattelMapObjectType.bullet,
-            value: ((playerID & 0x3F) << 6) | ((dir.index & 0x3) << 4) | ((speed & 0x3) << 2) | (hit & 0x3));
+            value: ((playerID & 0x3F) << 6) | ((dir.index & 0x3) << 4) | ((speed & 0x3) << 2) | (hit & 0x3)) {
+    bulletID = count;
+    count++;
+  }
 
-  Bullet.fromRaw(int value) : super(eTanksBattelMapObjectType.bullet, value: value);
+  Bullet.fromRaw(int value) : super(eTanksBattelMapObjectType.bullet, value: value) {
+    bulletID = count;
+    count++;
+  }
 
   eDirection getDir() {
     return eDirection.values[(value >> 4) & 0x03];
+  }
+
+  int get playerId => getPlayerID();
+  int get speed => getSpeed();
+  int get hit => getHits();
+  eDirection get dir => getDir();
+
+  // @override
+  // int newPosition(int x, int y) {
+  //   update((value & ~(0x7F << 20 | 0x7F << 13)) | (((x & 0x7F) << 20) | ((y & 0x7F) << 13)));
+
+  //   return value;
+  // }
+
+  bool get isMoved => ((value >> 12) & 0x01) == 1;
+
+  void setIsMovedFlag(bool on) {
+    if (on) {
+      update(BitHelper.setBit(value, 12));
+    } else {
+      update(BitHelper.clearBit(value, 12));
+    }
   }
 
   int getSpeed() {
@@ -38,19 +69,19 @@ class Bullet extends CellObject {
   }
 
   void setDir(eDirection dir) {
-    update(value | (dir.index & 0x03) << 4);
+    update(BitHelper.clearData(value, 0x03 << 4) | (dir.index & 0x03) << 4);
   }
 
   void setSpeed(int speed) {
-    update(value | (speed & 0x03) << 2);
+    update(BitHelper.clearData(value, 0x03 << 2) | (speed & 0x03) << 2);
   }
 
   void setHits(int hit) {
-    update(value | (hit & 0x03));
+    update(BitHelper.clearData(value, 0x03) | (hit & 0x03));
   }
 
   void setPlayerID(int player) {
-    update(value | (player & 0x3F) << 6);
+    update(BitHelper.clearData(value, 0x3F << 6) | (player & 0x3F) << 6);
   }
 }
 

@@ -151,6 +151,7 @@ void parseMap(Map<String, dynamic> json) {
   //   // bus?.send<List<Bullet>>(bullet);
   // }
   //---- Map object section V2
+  var lastIndex = w * h;
   Map<int, Tile> mapTile = {};
   Map<int, Tank> mapTank = {};
   Map<int, Wall> mapWall = {};
@@ -194,36 +195,32 @@ void parseMap(Map<String, dynamic> json) {
     var bullet = mapBullet[i];
 
     if (tile != null) {
-      gEventBus.send<Tile>(tile, eventName: '$x:$y');
+      gEventBus.send<Tile?>(tile, eventName: '$x:$y');
     } else {
-      if (lt != null) {
-        lt.setToDelete(true);
-        gEventBus.send<Tile>(lt, eventName: '$x:$y');
-      }
+      // gEventBus.send<Tile?>(null, eventName: '$x:$y');
     }
     if (wall != null) {
-      gEventBus.send<Wall>(wall, eventName: '$x:$y');
+      gEventBus.send<Wall?>(wall, eventName: '$x:$y');
     } else {
-      if (lw != null) {
-        lw.setToDelete(true);
-        gEventBus.send<Wall>(lw, eventName: '$x:$y');
-      }
+      // gEventBus.send<Wall?>(null, eventName: '$x:$y');
     }
     if (tank != null) {
-      gEventBus.send<Tank>(tank, eventName: '$x:$y');
+      gEventBus.send<Tank?>(tank, eventName: '$x:$y');
     } else {
-      if (ltank != null) {
-        ltank.setToDelete(true);
-        gEventBus.send<Tank>(ltank, eventName: '$x:$y');
-      }
+      // if (ltank != null) {
+      // ltank.setToDelete(true);
+      // gEventBus.send<Tank>(ltank, eventName: '$x:$y');
+      gEventBus.send<Tank?>(null, eventName: '$x:$y');
+      // }
     }
     if (bullet != null) {
-      gEventBus.send<Bullet>(bullet, eventName: '$x:$y');
+      gEventBus.send<Bullet?>(bullet, eventName: '$x:$y');
     } else {
-      if (lb != null) {
-        lb.setToDelete(true);
-        gEventBus.send<Bullet>(lb, eventName: '$x:$y');
-      }
+      // if (lb != null) {
+      // lb.setToDelete(true);
+      // gEventBus.send<Bullet?>(lb, eventName: '$x:$y');
+      gEventBus.send<Bullet?>(null, eventName: '$x:$y');
+      // }
     }
   }
 }

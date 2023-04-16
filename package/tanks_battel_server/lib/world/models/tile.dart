@@ -10,8 +10,12 @@ enum eTileType {
 }
 
 class Tile extends CellObject {
-  Tile(eTileType val) : super(eTanksBattelMapObjectType.terrain, value: val.index);
-  Tile.fromRaw(int value) : super(eTanksBattelMapObjectType.terrain, value: value);
+  Tile(eTileType val) : super(eTanksBattelMapObjectType.terrain, value: val.index) {
+    update(value);
+  }
+  Tile.fromRaw(int value) : super(eTanksBattelMapObjectType.terrain, value: value) {
+    update(value);
+  }
   eTileType getTileType() {
     return eTileType.values[value & 0x1FFF];
   }

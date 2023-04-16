@@ -17,7 +17,8 @@ TankActionsData _$TankActionsDataFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$TankActionsDataToJson(TankActionsData instance) =>
     <String, dynamic>{
       'key': instance.key,
-      'actions': instance.actions,
+      'actions':
+          instance.actions?.map((e) => _$eTankActionsEnumMap[e]!).toList(),
     };
 
 const _$eTankActionsEnumMap = {

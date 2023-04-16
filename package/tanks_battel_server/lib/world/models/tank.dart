@@ -45,19 +45,19 @@ class Tank extends CellObject {
   }
 
   void setToweDir(eDirection dir) {
-    update(value | (dir.index & 0x03) << 4);
+    update(BitHelper.clearData(value, 0x03 << 4) | (dir.index & 0x03) << 4);
   }
 
   void setPlatformDir(eDirection dir) {
-    update(value | (dir.index & 0x03) << 2);
+    update(BitHelper.clearData(value, 0x03 << 2) | (dir.index & 0x03) << 2);
   }
 
   void setHits(int hit) {
-    update(value | (hit & 0x03));
+    update(BitHelper.clearData(value, 0x03) | (hit & 0x03));
   }
 
   void setPlayerID(int player) {
-    update(value | (player & 0x3F) << 6);
+    update(BitHelper.clearData(value, 0x3F << 6) | (player & 0x3F) << 6);
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:event_bus_arch/event_bus_arch.dart';
 import 'package:tanks_battel_server/view_client/server_view_client.dart';
 import 'package:tanks_battel_server/world/logic/world_time_service.dart';
 import 'package:tanks_battel_server/world/models/action/action.dart';
+import 'package:tanks_battel_server/world/models/bullet.dart';
 import 'package:tanks_battel_server/world/models/map.dart';
 import 'package:tanks_battel_server/world/models/tank.dart';
 import 'package:tanks_battel_server/world/player/player.dart';
@@ -41,10 +42,12 @@ class WorldEventBus extends EventController {
     addHandler<Map<int, TankActionsData>>(calculateTurn, eventName: eWorldEventName.calculateTurn.name);
     addHandler<void>(start, eventName: eWorldEventName.start.name);
     addHandler<void>(stop, eventName: eWorldEventName.stop.name);
+
     addHandler<MapEntry<int, TankActionsData>>(playerAction, eventName: eWorldEventName.playerAction.name);
     map = TanksBattelMap(13, 13);
     map.init(null);
   }
+
   Future<void> addView(EventDTO<WebSocketChannel> event, EventEmitter<EventDTO<WebSocketChannel>>? emit,
       {EventBus? bus, Completer? needComplete}) async {
     viewers.add(ServerViewClient(event.data, this));
@@ -63,8 +66,8 @@ class WorldEventBus extends EventController {
 
   Future<void> addPlayer(EventDTO<WebSocketChannel> event, EventEmitter<EventDTO<WebSocketChannel>>? emit,
       {EventBus? bus, Completer? needComplete}) async {
-    if (!isStart && players.values.length < 5) {
-      while (!players.containsKey(_countPlayer) && players.isNotEmpty) {
+    if (/*!isStart &&*/ players.values.length < 5) {
+      while (players.containsKey(_countPlayer) && players.isNotEmpty) {
         _countPlayer++;
         if (_countPlayer > 0x1FFF) {
           _countPlayer = 1;
@@ -90,10 +93,12 @@ class WorldEventBus extends EventController {
       map.addObject(tank);
       players[_countPlayer] = Player(_countPlayer, this, channel: event.data, tank: tank);
       print('Add Player $_countPlayer');
-      if (!isStart) {
-        isStart = true;
-        send<void>(null, eventName: eWorldEventName.start.name);
-      }
+      _countPlayer++;
+      //Test -  for auto start
+      // if (!isStart) {
+      //   isStart = true;
+      //   send<void>(null, eventName: eWorldEventName.start.name);
+      // }
     }
   }
 
@@ -111,7 +116,7 @@ class WorldEventBus extends EventController {
     lastWorldTime = event.data;
     turnAction.clear();
     // var l = map.getChanges();
-    var m = map.getAll();
+    var m = event.data.turn < 2 ? map.getAll() : map.getChanges();
     for (var element in players.entries) {
       element.value.updateMap(
         m,
@@ -123,13 +128,14 @@ class WorldEventBus extends EventController {
     for (var element in viewers) {
       element.send({'w': map.width, 'h': map.height, 'map': m});
     }
+    map.clearToDelObj();
   }
 
   Future<void> start(EventDTO<void> event, EventEmitter<EventDTO<void>>? emit,
       {EventBus? bus, Completer? needComplete}) async {
     isStart = true;
 
-    tmr = Timer.periodic(Duration(seconds: 5), (timer) {
+    tmr = Timer.periodic(Duration(seconds: 1), (timer) {
       if (lastWorldTime == null) {
         lastWorldTime = WorldTime(turn: 0);
       }
@@ -172,13 +178,17 @@ class WorldEventBus extends EventController {
               case eTankActions.move_forward:
                 if (!isMove.contains(element.key)) {
                   isMove.add(element.key);
+                  // print('MoveF ${element.key} start: ${tanks[element.key]!.x} ${tanks[element.key]!.y}');
                   map.moveTank(tanks[element.key]!, isForward: true);
+                  // print('MoveF ${element.key} end: ${tanks[element.key]!.x} ${tanks[element.key]!.y}');
                 }
                 break;
               case eTankActions.move_back:
                 if (!isMove.contains(element.key)) {
                   isMove.add(element.key);
+                  // print('MoveB ${element.key} start: ${tanks[element.key]!.x} ${tanks[element.key]!.y}');
                   map.moveTank(tanks[element.key]!, isForward: false);
+                  // print('MoveB ${element.key} end: ${tanks[element.key]!.x} ${tanks[element.key]!.y}');
                 }
                 break;
               case eTankActions.platform_rotate_clockwise:
@@ -204,6 +214,10 @@ class WorldEventBus extends EventController {
           }
         }
       }
+    }
+    for (var element in map.bullets) {
+      map.moveBullet(element as Bullet);
+      element.setIsMovedFlag(false);
     }
   }
 }

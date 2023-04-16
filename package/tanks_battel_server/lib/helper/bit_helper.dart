@@ -18,4 +18,12 @@ class BitHelper {
   static int toggle(int val, int pos) {
     return val ^ (bit(pos));
   }
+
+  static int setData(int val, int data, {int pos = 0}) {
+    return val | (data << pos);
+  }
+
+  static int clearData(int val, int mask, {int pos = 0}) {
+    return val & (~(mask << pos));
+  }
 }

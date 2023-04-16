@@ -34,7 +34,7 @@ abstract class ICellObject extends Equatable {
   }
 
   int newPosition(int x, int y) {
-    update(value | (((x & 0x7F) << 20) | ((y & 0x7F) << 13)));
+    update((value & ~(0x7F << 20 | 0x7F << 13)) | (((x & 0x7F) << 20) | ((y & 0x7F) << 13)));
     return value;
   }
 
