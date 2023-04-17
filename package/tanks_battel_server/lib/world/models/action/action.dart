@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'action.g.dart';
 
-@JsonEnum()
+//@JsonEnum()
 enum eTankActions {
   platform_rotate_clockwise,
   platform_rotate_counterclockwise,
@@ -14,8 +14,15 @@ enum eTankActions {
 
   // String toJson() => index.toString();
   // static eTankActions fromJson(String json) => values.byName(json);
-  // int toJson() => index;
-  // static eTankActions fromJson(int json) => values[json];
+  int toJson() => index;
+  static eTankActions fromJson(dynamic json) => json is String ? values[int.parse(json)] : values[json];
+  static List<eTankActions>? fromListJson(List<dynamic>? json) {
+    return json?.map((e) => fromJson(e)).toList();
+  }
+
+  static List<int>? toListJson(List<eTankActions>? data) {
+    return data?.map((e) => e.index).toList();
+  }
 }
 
 enum eCommonActions {
@@ -30,6 +37,7 @@ class TankActionsData {
   String key;
 
   ///maximum 3 action
+  @JsonKey(fromJson: eTankActions.fromListJson, toJson: eTankActions.toListJson)
   List<eTankActions>? actions;
   // List<eCommonActions>? commonActions;
   TankActionsData({

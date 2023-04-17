@@ -95,10 +95,10 @@ class WorldEventBus extends EventController {
       print('Add Player $_countPlayer');
       _countPlayer++;
       //Test -  for auto start
-      // if (!isStart) {
-      //   isStart = true;
-      //   send<void>(null, eventName: eWorldEventName.start.name);
-      // }
+      if (!isStart) {
+        isStart = true;
+        send<void>(null, eventName: eWorldEventName.start.name);
+      }
     }
   }
 
